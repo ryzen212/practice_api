@@ -1,23 +1,26 @@
-﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Builder;
+﻿
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
+using practice_api.Contracts;
+using practice_api.Converters;
 using practice_api.Data;
+using practice_api.Repositories;
+using practice_api.Services;
+using practice_api.Validations;
+using Scalar.AspNetCore;
 using System.Security.Cryptography;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.Converters.Add(new TrimmingStringJsonConverter());
+    });
 
-// Add services to the container.
-byte[] secretBytes = new byte[64];
-using(var random = RandomNumberGenerator.Create())
-{
-    random.GetBytes(secretBytes);
-}  
-string secretKey = Convert.ToBase64String(secretBytes);
-
-builder.Services.AddControllers();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
 builder.Services.AddDbContext<AppDbContext>(option=>
@@ -39,16 +42,19 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJw
     options.TokenValidationParameters = new TokenValidationParameters
     {
         ValidateIssuer = true,
-        ValidateAudience = false,
+        ValidIssuer = builder.Configuration["AppSettings:Issuer"],
+        ValidateAudience = true,
+        ValidAudience = builder.Configuration["AppSettings:Audience"],
         ValidateLifetime = true,
         ValidateIssuerSigningKey = true,
-        ValidAudience = string.Empty,
-        ValidIssuer = "FreeTrained",
-        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey))
+        IssuerSigningKey = new SymmetricSecurityKey(
+    Encoding.UTF8.GetBytes(builder.Configuration["AppSettings:Token"]!)
+),
+
     };
 });
 builder.Services.AddAuthorization();
-builder.Services.AddIdentityApiEndpoints<IdentityUser>(options =>
+builder.Services.AddIdentityCore<AppIdentityUser>(options =>
 {
     options.Password.RequiredLength = 6;
     options.Password.RequireNonAlphanumeric = false;
@@ -56,8 +62,17 @@ builder.Services.AddIdentityApiEndpoints<IdentityUser>(options =>
     options.Password.RequireUppercase = false;
     options.Password.RequireLowercase = false;
 })
-.AddEntityFrameworkStores<AppDbContext>()
-.AddDefaultTokenProviders();
+.AddRoles<AppIdentityRole>()
+.AddEntityFrameworkStores<AppDbContext>();
+
+
+
+//Binding
+builder.Services.AddScoped(typeof(IUserRepository), typeof(UserRepository));
+builder.Services.AddScoped(typeof(IAuthServices), typeof(AuthServices));
+builder.Services.AddScoped(typeof(IUserServices), typeof(UserServices));
+builder.Services.AddScoped<UserValidation>();
+builder.Services.AddScoped(typeof(ITokenServices), typeof(TokenServices));
 
 var app = builder.Build();
 
@@ -65,20 +80,19 @@ var app = builder.Build();
 if (app.Environment.IsDevelopment())
 {
 
-
     app.MapOpenApi();
-    app.UseSwaggerUI(options =>
-    {
-        options.SwaggerEndpoint("/openapi/v1.json", "PracticeApi");
-    });
+    app.MapScalarApiReference();
+
 }
 
-app.MapIdentityApi<IdentityUser>();
+//app.MapIdentityApi<IdentityUser>();
 app.UseHttpsRedirection();
 app.UseCors("FrontEnd");
 app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+
+
 
 app.Run();
