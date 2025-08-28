@@ -1,4 +1,5 @@
-﻿using Humanizer;
+﻿using FluentValidation;
+using Humanizer;
 using Lpul_Inventory.Controllers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -15,11 +16,11 @@ namespace practice_api.Controllers
     public class UserController : Controller
     {
         private readonly IUserServices _userService;
-  
-        
-        public UserController(IUserServices userServices) {
-            _userService = userServices;
-      
+        private readonly IValidator<UserCreateDto> _userCreateValidator;
+
+        public UserController(IUserServices userService, IValidator<UserCreateDto> userCreateValidator) {
+            _userService = userService;
+            _userCreateValidator = userCreateValidator;
         }
         [Authorize]
         [HttpGet]
@@ -35,8 +36,27 @@ namespace practice_api.Controllers
         public async Task<IActionResult> Create(UserCreateDto request)
         {
             try {
-                var result = await _userService.Create(request);
 
+                var validationResults = _userCreateValidator.Validate(request);
+                if (!validationResults.IsValid)
+                {
+                var errors = validationResults.Errors
+                .GroupBy(e => char.ToLowerInvariant(e.PropertyName[0]) + e.PropertyName.Substring(1)) // camelCase
+                .ToDictionary(
+                g => g.Key,
+                g => g.Select(e => e.ErrorMessage).ToArray()
+    );
+                    return BadRequest(new
+                    {
+                        error = true,
+                        status = "Adding user failed",
+                        errors = errors,
+                        messsage = "Please try again."
+
+                    });
+                }
+
+                var result = await _userService.Create(request);
     
                 if (result.Errors != null)
                 {

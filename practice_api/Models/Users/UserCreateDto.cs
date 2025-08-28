@@ -1,26 +1,25 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 
 namespace practice_api.Models.Users
 {
     public class UserCreateDto
     {
-        [Required]
-        [EmailAddress]
 
+
+        [JsonPropertyName("username")]
         public string UserName { get; set; }
 
-
-        [Required]
-        public string Password { get; set; }
-
-        [Required]
-        [EmailAddress]
+        [JsonPropertyName("email")]
         public string Email { get; set; }
-        [Required]
+
+        [JsonPropertyName("phoneNumber")]
         public string PhoneNumber { get; set; }
 
+        [JsonPropertyName("password")]
+        public string Password { get; set; }
 
-        [Required]
+        [JsonPropertyName("role")]
         public string Role { get; set; }
     }
 }

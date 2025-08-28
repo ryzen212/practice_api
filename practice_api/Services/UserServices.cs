@@ -25,12 +25,7 @@ namespace practice_api.Services
        public async Task<ServiceResult> Create(UserCreateDto request)
         {
 
-          var validate   = _userValidate.Create(request);
-            if (validate.Error)
-            {
-                return ServiceResult.Fail("Failed", "User not created", validate.Errors);
-            }
-
+       
             var user = new AppIdentityUser
             {
                 UserName = request.UserName,

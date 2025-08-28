@@ -1,4 +1,5 @@
 ﻿
+using FluentValidation;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -13,13 +14,16 @@ using practice_api.Validations;
 using Scalar.AspNetCore;
 using System.Security.Cryptography;
 using System.Text;
-
+using System.Text.Json;
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers()
     .AddJsonOptions(options =>
     {
         options.JsonSerializerOptions.Converters.Add(new TrimmingStringJsonConverter());
+        options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
     });
+
+
 
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
@@ -73,6 +77,10 @@ builder.Services.AddScoped(typeof(IAuthServices), typeof(AuthServices));
 builder.Services.AddScoped(typeof(IUserServices), typeof(UserServices));
 builder.Services.AddScoped<UserValidation>();
 builder.Services.AddScoped(typeof(ITokenServices), typeof(TokenServices));
+
+//Validation
+builder.Services.AddValidatorsFromAssembly(typeof(Program).Assembly, includeInternalTypes: true);
+
 
 var app = builder.Build();
 
