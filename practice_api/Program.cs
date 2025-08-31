@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using practice_api.Contracts;
+using practice_api.Controllers;
 using practice_api.Converters;
 using practice_api.Data;
 using practice_api.Repositories;
@@ -20,7 +21,7 @@ builder.Services.AddControllers()
     .AddJsonOptions(options =>
     {
         options.JsonSerializerOptions.Converters.Add(new TrimmingStringJsonConverter());
-        options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
+        //options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
     });
 
 
@@ -77,6 +78,10 @@ builder.Services.AddScoped(typeof(IAuthServices), typeof(AuthServices));
 builder.Services.AddScoped(typeof(IUserServices), typeof(UserServices));
 builder.Services.AddScoped<UserValidation>();
 builder.Services.AddScoped(typeof(ITokenServices), typeof(TokenServices));
+builder.Services.AddScoped(typeof(IValidationService), typeof(ValidationService));
+builder.Services.AddScoped(typeof(IRoleRepository), typeof(RoleRepository));
+
+
 
 //Validation
 builder.Services.AddValidatorsFromAssembly(typeof(Program).Assembly, includeInternalTypes: true);

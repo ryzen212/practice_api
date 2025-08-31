@@ -1,21 +1,61 @@
 ﻿using FluentValidation;
 using Microsoft.EntityFrameworkCore;
+using practice_api.Contracts;
+using practice_api.Controllers;
 using practice_api.Models.Users;
+using System.Threading.Tasks;
 
 namespace practice_api.Validations.User
 {
     public class UserCreateValidator : AbstractValidator<UserCreateDto>
     {
+        private readonly IRoleRepository _roleRepository;
+        private readonly IUserRepository _userRepository;
+        public UserCreateValidator(IRoleRepository roleRepository, IUserRepository userRepository) {
+         _roleRepository = roleRepository;
+         _userRepository = userRepository;
 
-        public UserCreateValidator() { 
-        RuleFor(x=>x.UserName).NotEmpty().WithName("userName").WithMessage("Username is Required");
-        RuleFor(x => x.Email).NotEmpty().WithName("emai").WithMessage("Email is Required");
-        RuleFor(x => x.PhoneNumber).NotEmpty().WithName("username").WithMessage("Phonenumber is Required");
-        RuleFor(x => x.Password).NotEmpty().WithName("username").WithMessage("Password is Required");
-        RuleFor(x => x.Role).NotEmpty().WithName("username").WithMessage("Role is Required");
+
+            RuleFor(x=>x.UserName)
+            .Cascade(CascadeMode.Stop)
+            .NotEmpty()
+            .WithMessage("Username is Required")
+            .MustAsync(UniqueUsername).WithMessage("Username already taken");
+
+            RuleFor(x => x.Email)
+            .Cascade(CascadeMode.Stop)
+            .NotEmpty().WithMessage("Email is Required")
+            .MustAsync(UniqueEmail).WithMessage("Email already taken");
+
+            RuleFor(x => x.PhoneNumber).NotEmpty().WithMessage("Phonenumber is Required");
+            
+            RuleFor(x => x.Password).NotEmpty().WithMessage("Password is Required");
+
+            RuleFor(x => x.Role)
+            .Cascade(CascadeMode.Stop)
+            .NotEmpty().WithMessage("Role is Required")
+            .MustAsync( RoleExistsAsync).WithMessage("Role does not exist"); 
+
         }
 
-      
+        private async Task<bool> RoleExistsAsync(string role, CancellationToken cancellationToken)
+        {
+         
+            return await _roleRepository.RoleExistsAsync(role);
 
+        }
+
+        private async Task<bool> UniqueEmail(string email, CancellationToken cancellationToken)
+        {
+
+            return !await _userRepository.EmailExistsAsync(email);
+
+        }
+        private async Task<bool> UniqueUsername(string username, CancellationToken cancellationToken)
+        {
+
+            return !await _userRepository.UserNameExistAsync(username);
+
+        }
     }
 }

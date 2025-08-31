@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Azure.Core;
+using Microsoft.EntityFrameworkCore;
 using practice_api.Contracts;
 using practice_api.Data;
 using practice_api.Models.Auth;
@@ -14,18 +15,22 @@ namespace practice_api.Services
     {
         private readonly IUserRepository _userRepo;
         private readonly AppDbContext _context;
-        private readonly UserValidation _userValidate;
+        private readonly IValidationService _validationService;
+       
 
-        public UserServices(IUserRepository userRepo,  AppDbContext context, UserValidation userValidate)
+        public UserServices(IUserRepository userRepo,  AppDbContext context, IValidationService validationService)
         {
             _userRepo = userRepo;
             _context = context;
-            _userValidate = userValidate;
+            _validationService = validationService;
         }
        public async Task<ServiceResult> Create(UserCreateDto request)
         {
+            var errors =await _validationService.ValidateAsync(request);
 
-       
+            if (errors != null) {
+                return ServiceResult.Fail("Error", "User create failed.",errors);
+            }
             var user = new AppIdentityUser
             {
                 UserName = request.UserName,
@@ -53,6 +58,7 @@ namespace practice_api.Services
                                  Role = roleJoin.Name,
                                  UserImg = users.UserImg,
                                  Email = users.Email,
+                                 PhoneNumber = users.PhoneNumber,
 
                                });
 

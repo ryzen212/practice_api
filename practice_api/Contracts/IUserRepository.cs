@@ -13,5 +13,9 @@ namespace practice_api.Contracts
 
         public Task<IdentityResult> AddToRoleAsync(AppIdentityUser user, string role);
         public  Task<string> GetUserRole(AppIdentityUser user);
+
+        public  Task<bool> EmailExistsAsync(string email);
+
+        public Task<bool> UserNameExistAsync(string username);
     }
 }
