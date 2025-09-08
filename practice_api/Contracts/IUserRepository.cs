@@ -11,11 +11,14 @@ namespace practice_api.Contracts
 
         public  Task<IdentityResult> CreateAsync(AppIdentityUser user, string password);
 
+        public Task<IdentityResult> UpdateAsync(AppIdentityUser user);
         public Task<IdentityResult> AddToRoleAsync(AppIdentityUser user, string role);
+        public Task<IdentityResult> RemoveFromRoleAsync(AppIdentityUser user, string role);
         public  Task<string> GetUserRole(AppIdentityUser user);
 
-        public  Task<bool> EmailExistsAsync(string email);
+        public Task<bool> EmailExistsAsync(string email, string? excludeId = null);
 
-        public Task<bool> UserNameExistAsync(string username);
+
+        public Task<bool> UserNameExistAsync(string username, string? excludeId = null);
     }
 }

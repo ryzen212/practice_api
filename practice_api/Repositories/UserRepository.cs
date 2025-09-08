@@ -1,9 +1,12 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.BlazorIdentity.Pages.Manage;
 using practice_api.Contracts;
 using practice_api.Data;
+using practice_api.Models.Users;
 using System.Configuration;
+using System.Data;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
@@ -46,7 +49,6 @@ namespace practice_api.Repositories
         }
         public async Task<IdentityResult> CreateAsync(AppIdentityUser user, string password)
         {
-  
 
             return await _userManager.CreateAsync(user, password);
         }
@@ -65,19 +67,43 @@ namespace practice_api.Repositories
             return roles.FirstOrDefault();
         }
 
-        public async Task<bool> EmailExistsAsync(string email)
+        public async Task<bool> EmailExistsAsync(string email, string? excludeId = null)
         {
-            var user = await _userManager.FindByEmailAsync(email);
+
+            var query = _userManager.Users.AsQueryable()
+                       .Where(u => u.Email == email);
+            if (!string.IsNullOrEmpty(excludeId))
+            {
+                query = query.Where(u => u.Id != excludeId);
+            }
       
-            return user != null;
+            return await query.AnyAsync();
         }
 
-        public async Task<bool> UserNameExistAsync(string username)
+        public async Task<bool> UserNameExistAsync(string username, string? excludeId = null)
         {
-            var user = await _userManager.FindByNameAsync(username);
-            return user != null;
+            var query = _userManager.Users.AsQueryable()
+                      .Where(u => u.UserName == username);
+            if (!string.IsNullOrEmpty(excludeId))
+            {
+                query = query.Where(u => u.Id != excludeId);
+            }
+
+            return await query.AnyAsync();
+        }
+
+        public async Task<IdentityResult> UpdateAsync( AppIdentityUser user)
+        {
+
+            return await _userManager.UpdateAsync(user);
+        }
+        public async Task<IdentityResult> RemoveFromRoleAsync(AppIdentityUser user, string role)
+        {
+          
+            return await _userManager.RemoveFromRoleAsync(user, role);
         }
 
 
+ 
     }
 }

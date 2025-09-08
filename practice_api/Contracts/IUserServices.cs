@@ -10,5 +10,6 @@ namespace practice_api.Contracts
         public Task<TableResponse<UserDto>> Table(TableRequest request);
 
         public Task<ServiceResult> Create(UserCreateDto request);
+        public Task<ServiceResult> Update(string id, UserUpdateDto request);
     }
 }

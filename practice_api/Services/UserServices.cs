@@ -44,6 +44,30 @@ namespace practice_api.Services
 
         }
 
+        public async Task<ServiceResult> Update(string id, UserUpdateDto request)
+        {
+            Console.WriteLine(request.Id);
+            var errors = await _validationService.ValidateAsync(request);
+
+            if (errors != null)
+            {
+                return ServiceResult.Fail("Error", "User create failed.", errors);
+            }
+            var user = await _userRepo.FindByIdAsync(id);
+
+            user.PhoneNumber = request.PhoneNumber;
+            user.UserName = request.UserName;
+            user.Email = request.Email;
+
+            var updateResult = await _userRepo.UpdateAsync(user);
+            var removeRoleResult = await _userRepo.RemoveFromRoleAsync(user, request.Role);
+            var addRoleResult = await _userRepo.AddToRoleAsync(user, request.Role);
+     
+
+            return ServiceResult.Success("Success", "User Updated successfully.");
+
+        }
+
         public async Task<TableResponse<UserDto>> Table(TableRequest request)
         {
             var query =  (from users in _context.Users

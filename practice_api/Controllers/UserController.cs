@@ -55,7 +55,32 @@ namespace practice_api.Controllers
             }
   
         }
-    
+        [HttpPut("{id}")]
+        public async Task<IActionResult> Update(string id, [FromBody] UserUpdateDto request) { 
+            try
+            {
+           
+                request.Id = id;
+                var result = await _userService.Update(id,request);
+
+                if (result.Errors != null)
+                {
+                    return UnprocessableEntity(result);
+                }
+                return Ok(result);
+            }
+            catch (Exception e)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, new
+                {
+                    error = true,
+                    status = "Error",
+                    message = e.Message // hide ex.Message in production
+                });
+            }
+
+        }
+
 
     }
 }
