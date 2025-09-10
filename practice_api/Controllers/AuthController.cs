@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using NuGet.Common;
 using practice_api.Contracts;
 using practice_api.Data;
@@ -28,6 +29,7 @@ namespace practice_api.Controllers
         }
 
         [HttpPost("login")]
+        [EnableRateLimiting("login")]
         public async Task<IActionResult> Login(AuthLoginRequest request)
         {
             try

@@ -2,6 +2,7 @@
 using FluentValidation;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
@@ -16,6 +17,7 @@ using Scalar.AspNetCore;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
+using System.Threading.RateLimiting;
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers()
     .AddJsonOptions(options =>
@@ -31,6 +33,23 @@ builder.Services.AddOpenApi();
 builder.Services.AddDbContext<AppDbContext>(option=>
 option.UseSqlServer(builder.Configuration.GetConnectionString("Default")));
 
+
+builder.Services.AddRateLimiter(rateLimetterOptions =>
+{
+    rateLimetterOptions.AddFixedWindowLimiter("fixed", options =>
+    {
+        options.Window = TimeSpan.FromSeconds(10);
+        options.PermitLimit = 3;
+        options.QueueLimit = 3;
+        options.QueueProcessingOrder = QueueProcessingOrder.OldestFirst;
+    });
+    rateLimetterOptions.AddFixedWindowLimiter("login", options =>
+    {
+        options.Window = TimeSpan.FromSeconds(10);
+        options.PermitLimit = 3;
+        options.QueueLimit = 0;
+    });
+});
 
 builder.Services.AddCors(opt =>
 {
@@ -100,6 +119,8 @@ if (app.Environment.IsDevelopment())
 
 //app.MapIdentityApi<IdentityUser>();
 app.UseHttpsRedirection();
+
+app.UseRateLimiter();
 app.UseCors("FrontEnd");
 app.UseAuthentication();
 app.UseAuthorization();
