@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using practice_api.Data;
 
-namespace practice_api.Controllers
+namespace practice_api.Contracts
 {
     public interface IRoleRepository
     {

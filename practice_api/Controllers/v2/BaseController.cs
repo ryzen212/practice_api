@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Lpul_Inventory.Controllers
+namespace practice_api.Controllers.v2
 {
     //[Authorize]
     public class BaseController : Controller

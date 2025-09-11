@@ -1,19 +1,18 @@
-﻿using FluentValidation;
-using Humanizer;
-using Lpul_Inventory.Controllers;
+﻿using Asp.Versioning;
+
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using practice_api.Contracts;
 using practice_api.Models.Shared;
 using practice_api.Models.Users;
-using practice_api.Services;
-using practice_api.Validations;
 
-namespace practice_api.Controllers
+
+namespace practice_api.Controllers.v1
 {
- 
 
-    [Route("api/users")]
+
+    [Route("api/v{version:apiVersion}/users")]
+    [ApiVersion("1.0")]
     public class UserController : Controller
     {
         private readonly IUserServices _userService;

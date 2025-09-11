@@ -1,4 +1,5 @@
-﻿using Azure.Core;
+﻿using Asp.Versioning;
+using Azure.Core;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Identity;
@@ -10,12 +11,13 @@ using practice_api.Data;
 using practice_api.Models.Auth;
 
 
-namespace practice_api.Controllers
+namespace practice_api.Controllers.v1
 {
 
     [ApiController]
-    [Route("api/auth")]
 
+    [Route("api/v{version:apiVersion}/auth")]
+    [ApiVersion("1.0")]
     public class AuthController : Controller
     {
         private readonly AppDbContext _context;

@@ -1,5 +1,5 @@
 ﻿using Microsoft.AspNetCore.Identity;
-using practice_api.Controllers;
+using practice_api.Contracts;
 using practice_api.Data;
 using System.Data;
 

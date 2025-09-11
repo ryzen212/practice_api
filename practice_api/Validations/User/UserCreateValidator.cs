@@ -1,7 +1,6 @@
 ﻿using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 using practice_api.Contracts;
-using practice_api.Controllers;
 using practice_api.Models.Users;
 using System.Threading.Tasks;
 

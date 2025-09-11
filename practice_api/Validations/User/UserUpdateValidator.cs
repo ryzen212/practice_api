@@ -3,7 +3,6 @@ using Humanizer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.BlazorIdentity.Pages.Manage;
 using practice_api.Contracts;
-using practice_api.Controllers;
 using practice_api.Models.Users;
 using System.Threading.Tasks;
 
