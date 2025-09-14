@@ -13,11 +13,11 @@ using practice_api.Models.Auth;
 
 namespace practice_api.Controllers.v1
 {
-
+    [ApiVersion("1.0")]
     [ApiController]
 
     [Route("api/v{version:apiVersion}/auth")]
-    [ApiVersion("1.0")]
+
     public class AuthController : Controller
     {
         private readonly AppDbContext _context;

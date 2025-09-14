@@ -1,7 +1,9 @@
 ﻿
+using Asp.Versioning.ApiExplorer;
 using Asp.Versioning.Conventions;
 using FluentValidation;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
@@ -26,24 +28,11 @@ builder.Services.AddControllers()
         //options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
     });
 
-builder.Services.AddApiVersioning(options =>
-{
-    options.AssumeDefaultVersionWhenUnspecified = true;
-    options.DefaultApiVersion = new Asp.Versioning.ApiVersion(1, 0);
-    options.ReportApiVersions = true;
-}).AddMvc(options =>
-{
-    options.Conventions.Add(new VersionByNamespaceConvention());
-}).AddApiExplorer(options =>
-{
-    options.GroupNameFormat = "'v'V";
-    options.SubstituteApiVersionInUrl = true;
-});
-
 
 
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
+builder.Services.AddOpenApi("v2");
 builder.Services.AddDbContext<AppDbContext>(option=>
 option.UseSqlServer(builder.Configuration.GetConnectionString("Default")));
 
@@ -115,9 +104,24 @@ builder.Services.AddScoped(typeof(IValidationService), typeof(ValidationService)
 builder.Services.AddScoped(typeof(IRoleRepository), typeof(RoleRepository));
 
 
-
 //Validation
 builder.Services.AddValidatorsFromAssembly(typeof(Program).Assembly, includeInternalTypes: true);
+
+//Api  versioning 
+
+builder.Services.AddApiVersioning(options =>
+{
+    options.AssumeDefaultVersionWhenUnspecified = true;
+    options.DefaultApiVersion = new Asp.Versioning.ApiVersion(1, 0);
+    options.ReportApiVersions = true;
+}).AddMvc(options =>
+{
+    options.Conventions.Add(new VersionByNamespaceConvention());
+}).AddApiExplorer(options =>
+{
+    options.GroupNameFormat = "'v'V";
+    options.SubstituteApiVersionInUrl = true;
+});
 
 
 var app = builder.Build();
@@ -127,8 +131,16 @@ if (app.Environment.IsDevelopment())
 {
 
     app.MapOpenApi();
-    app.MapScalarApiReference();
+    //app.MapScalarApiReference();
 
+    app.UseSwaggerUI(options =>
+    {
+        var provider = app.Services.GetRequiredService<IApiVersionDescriptionProvider>();
+        foreach (var description in provider.ApiVersionDescriptions)
+        {
+            options.SwaggerEndpoint($"/openapi/{description.GroupName}.json", description.GroupName.ToUpperInvariant());
+        }
+    });
 }
 
 //app.MapIdentityApi<IdentityUser>();

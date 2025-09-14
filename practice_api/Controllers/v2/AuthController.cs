@@ -13,10 +13,10 @@ using practice_api.Models.Auth;
 
 namespace practice_api.Controllers.v2
 {
-
+    [ApiVersion("2.0")]
     [ApiController]
     [Route("api/v{version:apiVersion}/auth")]
-    [ApiVersion("2.0")]
+
     public class AuthController : Controller
     {
         private readonly AppDbContext _context;
@@ -125,20 +125,6 @@ namespace practice_api.Controllers.v2
 
             // return what you want
      
-        }
-
-        [Authorize]
-        [HttpGet("test")]
-        public IActionResult AuthenticatedOnlyEndpoint()
-        {
-            return Ok("You are Authenticated");
-        }
-
-        [Authorize(Roles = "Admin")]
-        [HttpGet("test-role")]
-        public IActionResult AdminOnlyEndpoint()
-        {
-            return Ok("You are Authenticated");
         }
 
     }

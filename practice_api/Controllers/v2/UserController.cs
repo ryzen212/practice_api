@@ -9,10 +9,10 @@ using practice_api.Models.Users;
 
 namespace practice_api.Controllers.v2
 {
-
-
-    [Route("api/v{version:apiVersion}/users")]
+    [ApiController]
     [ApiVersion("2.0")]
+    [Route("api/v{version:apiVersion}/users")]
+   
     public class UserController : Controller
     {
         private readonly IUserServices _userService;
