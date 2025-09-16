@@ -23,7 +23,7 @@ namespace practice_api.Models.Auth
                 User = new UserDto
                 {
                     Id = user.Id,
-                    UserImg = user.UserImg,
+                Avatar = user.Avatar,
                     UserName = user.UserName,
                     Email = user.Email
                 },

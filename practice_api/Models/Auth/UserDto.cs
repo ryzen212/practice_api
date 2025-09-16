@@ -8,6 +8,6 @@
         public string Role { get; set; }
         public string PhoneNumber { get; set; }
         
-        public string? UserImg { get; set; }
+        public string? Avatar { get; set; }
     }
 }

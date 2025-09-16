@@ -87,7 +87,7 @@ namespace practice_api.Services
             return new UserDto
             {
                 Id = user.Id,
-                UserImg = user.UserImg,
+              Avatar = user.Avatar,
                 UserName = user.UserName,
                 Email = user.Email
             };

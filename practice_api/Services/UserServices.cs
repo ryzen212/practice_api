@@ -80,7 +80,7 @@ namespace practice_api.Services
                                  Id = users.Id,
                                  UserName = users.Email,
                                  Role = roleJoin.Name,
-                                 UserImg = users.UserImg,
+                                 Avatar = users.Avatar,
                                  Email = users.Email,
                                  PhoneNumber = users.PhoneNumber,
 

@@ -6,11 +6,15 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace practice_api.Migrations
 {
     /// <inheritdoc />
-    public partial class AddRefreshToken : Migration
+    public partial class CreateTokenTable : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.DropColumn(
+                name: "Avatar",
+                table: "AspNetUsers");
+
             migrationBuilder.CreateTable(
                 name: "RefreshTokens",
                 columns: table => new
@@ -48,6 +52,12 @@ namespace practice_api.Migrations
         {
             migrationBuilder.DropTable(
                 name: "RefreshTokens");
+
+            migrationBuilder.AddColumn<string>(
+                name: "Avatar",
+                table: "AspNetUsers",
+                type: "nvarchar(max)",
+                nullable: true);
         }
     }
 }

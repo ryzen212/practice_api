@@ -5,7 +5,7 @@
 namespace practice_api.Migrations
 {
     /// <inheritdoc />
-    public partial class AddAvatarToUsersTable : Migration
+    public partial class AddAvatarUserTable : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)

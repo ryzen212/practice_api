@@ -12,8 +12,8 @@ using practice_api.Data;
 namespace practice_api.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250816113547_AddRefreshToken")]
-    partial class AddRefreshToken
+    [Migration("20250916125150_CreateTokenTable")]
+    partial class CreateTokenTable
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -205,9 +205,6 @@ namespace practice_api.Migrations
 
                     b.Property<bool>("TwoFactorEnabled")
                         .HasColumnType("bit");
-
-                    b.Property<string>("UserImg")
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("UserName")
                         .HasMaxLength(256)

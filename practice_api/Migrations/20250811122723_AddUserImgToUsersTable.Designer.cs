@@ -12,8 +12,8 @@ using practice_api.Data;
 namespace practice_api.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250811122723_AddUserImgToUsersTable")]
-    partial class AddUserImgToUsersTable
+    [Migration("20250811122723_AddAvatarToUsersTable")]
+    partial class AddAvatarToUsersTable
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -206,7 +206,7 @@ namespace practice_api.Migrations
                     b.Property<bool>("TwoFactorEnabled")
                         .HasColumnType("bit");
 
-                    b.Property<string>("UserImg")
+                    b.Property<string>("Avatar")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("UserName")
