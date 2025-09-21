@@ -1,10 +1,6 @@
-﻿using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using practice_api.Contracts;
+﻿using practice_api.Contracts;
 using practice_api.Data;
 using practice_api.Models.Auth;
-using practice_api.Models.Response;
 using practice_api.Models.Token;
 
 namespace practice_api.Services
@@ -13,19 +9,31 @@ namespace practice_api.Services
     {
         private readonly IUserRepository _userRepo;
         private readonly ITokenServices _tokenService;
-        public AuthServices(IUserRepository userRepo, ITokenServices tokenService) {
+        private readonly IValidationService _validationService;
+
+        public AuthServices(IUserRepository userRepo, ITokenServices tokenService, IValidationService validationService)
+        {
 
             _userRepo = userRepo;
             _tokenService = tokenService;
-
+            _validationService = validationService;
         }
-        public async Task<AuthServiceResult> Login(AuthLoginRequest request)
+        public async Task<AuthServiceResult> Login(LoginRequest request)
         {
+
+            //Validate using fluentvalidation 
+            var errors =  _validationService.Validate(request);
+
+            if (errors != null)
+            {
+                return AuthServiceResult.FailWithErrors(errors);
+            }
+
             var user = await _userRepo.FindByNameAsync(request.UserName);
 
             if (user == null)
             {
-                return AuthServiceResult.Fail(null);
+                return AuthServiceResult.Fail("Invalid username or password");
 
             }
             bool isPasswordValid = await _userRepo.CheckPasswordAsync(user, request.Password);
@@ -33,7 +41,7 @@ namespace practice_api.Services
             if (!isPasswordValid)
             {
 
-                return AuthServiceResult.Fail(null);
+                return AuthServiceResult.Fail("Invalid username or password");
             }
 
             string accessToken = await _tokenService.GenerateAccessToken(user);
@@ -44,7 +52,7 @@ namespace practice_api.Services
 
         }
 
-        public async Task<AuthServiceResult> Register(AuthRegister request)
+        public async Task<AuthServiceResult> Register(RegisterRequest request)
         {
 
             var user = new AppIdentityUser
@@ -56,15 +64,6 @@ namespace practice_api.Services
 
             var result = await _userRepo.CreateAsync(user, request.Password);
             var roleResult = await _userRepo.AddToRoleAsync(user, request.Role);
-
-            if (!result.Succeeded || !roleResult.Succeeded)
-            {
-                var errors = result.Errors.Any()
-                  ? result.Errors.Select(e => e.Description).ToList()
-                  : null;
-                return AuthServiceResult.Fail(errors);
-
-            }
 
             string accessToken = await _tokenService.GenerateAccessToken(user);
             var refreshToken = await _tokenService.GenerateAndSaveRefreshToken(user);

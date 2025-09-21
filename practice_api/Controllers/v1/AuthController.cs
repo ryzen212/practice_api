@@ -15,37 +15,39 @@ namespace practice_api.Controllers.v1
 {
     [ApiVersion("1.0")]
     [ApiController]
-
     [Route("api/v{version:apiVersion}/auth")]
 
     public class AuthController : Controller
     {
-        private readonly AppDbContext _context;
-        private readonly IAuthServices _authService;
-     
 
-        public AuthController(AppDbContext context , IAuthServices authService)
+        private readonly IAuthServices _authService;
+        private readonly ILogger<AuthController> _logger;
+
+        public AuthController(IAuthServices authService, ILogger<AuthController> logger)
         {
-            _context = context;
+      
             _authService = authService;
+            _logger = logger;
         }
 
         [HttpPost("login")]
         [EnableRateLimiting("login")]
-        public async Task<IActionResult> Login(AuthLoginRequest request)
+        public async Task<IActionResult> Login(LoginRequest request)
         {
             try
             {
+
                 var result = await _authService.Login(request);
-
-                if (result.Error) {
-                    return Unauthorized(result);
+                if (result.Error)
+                {
+                    return result.Errors.Any() ?  UnprocessableEntity(result) : Unauthorized(result);
                 }
+           
                 return Ok(result);
-
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, " - Login Error");
                 return StatusCode(StatusCodes.Status500InternalServerError, new
                 {
                     error = true,
@@ -56,7 +58,7 @@ namespace practice_api.Controllers.v1
 
         }
         [HttpPost("register")]
-        public async Task<IActionResult> Register(AuthRegister request)
+        public async Task<IActionResult> Register(RegisterRequest request)
         {
             try
             {
@@ -70,6 +72,7 @@ namespace practice_api.Controllers.v1
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, "- Register Error");
                 return StatusCode(StatusCodes.Status500InternalServerError, new
                 {
                     error = true,
@@ -88,6 +91,7 @@ namespace practice_api.Controllers.v1
                 var result = await _authService.Refresh(refreshToken);
                 return Ok (result);
             } catch (Exception ex) {
+                _logger.LogError(ex, "- Refresh token Error");
                 return StatusCode(StatusCodes.Status500InternalServerError, new
                 {
                     error = true,
@@ -113,6 +117,7 @@ namespace practice_api.Controllers.v1
                 return Ok(result);
             }
             catch (Exception ex) {
+                _logger.LogError(ex, "- Authcontroller Getuser");
                 return StatusCode(StatusCodes.Status500InternalServerError, new
                 {
                     error = true,
@@ -120,27 +125,10 @@ namespace practice_api.Controllers.v1
                     message = "An unexpected error occurred." // hide ex.Message in production
                 });
             }
-            // 👇 The token is automatically validated by middleware
-            
-                
-
-            // return what you want
+           
      
         }
 
-        [Authorize]
-        [HttpGet("test")]
-        public IActionResult AuthenticatedOnlyEndpoint()
-        {
-            return Ok("You are Authenticated");
-        }
-
-        [Authorize(Roles = "Admin")]
-        [HttpGet("test-role")]
-        public IActionResult AdminOnlyEndpoint()
-        {
-            return Ok("You are Authenticated");
-        }
 
     }
 }

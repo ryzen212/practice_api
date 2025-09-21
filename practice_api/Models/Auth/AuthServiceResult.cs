@@ -1,5 +1,4 @@
 ﻿using practice_api.Data;
-using practice_api.Models.Response;
 
 
 namespace practice_api.Models.Auth
@@ -8,9 +7,10 @@ namespace practice_api.Models.Auth
     {
         public bool Error { get; set; }
 
-        public List<string> Errors { get; set; }
+        public Dictionary<string, string[]> Errors { get; set; }
 
         public UserDto User { get; set; }
+        public string Message { get; set; }
         public string AccessToken { get; set; }
         public string RefreshToken { get; set; }
 
@@ -32,19 +32,26 @@ namespace practice_api.Models.Auth
             };
         }
 
-        public static AuthServiceResult Fail(List<string> Errors)
+        public static AuthServiceResult FailWithErrors(Dictionary<string, string[]> errors)
         {
             return new AuthServiceResult
             {
                 Error = true,
-                Errors = Errors,
-                User = null,
-                AccessToken = null,
-                RefreshToken = null
+                Errors = errors,
+         
+            };
+        }
+        public static AuthServiceResult Fail(string message)
+        {
+            return new AuthServiceResult
+            {
+                Error = true,
+                Errors = null,
+                Message = message,
+       
             };
         }
 
 
-  
     }
     }

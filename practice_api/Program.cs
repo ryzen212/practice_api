@@ -32,7 +32,7 @@ builder.Services.AddControllers()
 
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
-builder.Services.AddOpenApi("v2");
+//builder.Services.AddOpenApi("v2");
 builder.Services.AddDbContext<AppDbContext>(option=>
 option.UseSqlServer(builder.Configuration.GetConnectionString("Default")));
 
@@ -122,7 +122,7 @@ builder.Services.AddApiVersioning(options =>
     options.GroupNameFormat = "'v'V";
     options.SubstituteApiVersionInUrl = true;
 });
-
+builder.Logging.AddConsole();   // logs to console
 
 var app = builder.Build();
 

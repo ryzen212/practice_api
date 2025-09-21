@@ -29,7 +29,7 @@ namespace practice_api.Services
             var errors =await _validationService.ValidateAsync(request);
 
             if (errors != null) {
-                return ServiceResult.Fail("Error", "User create failed.",errors);
+                return ServiceResult.FailWithErrors(errors);
             }
             var user = new AppIdentityUser
             {
@@ -37,8 +37,8 @@ namespace practice_api.Services
                 Email = request.Email,
                 PhoneNumber = request.PhoneNumber,
             };
-            var createResult = await _userRepo.CreateAsync(user,request.Password);
-            var roleResult = await _userRepo.AddToRoleAsync(user, request.Role);
+            await _userRepo.CreateAsync(user,request.Password);
+            await _userRepo.AddToRoleAsync(user, request.Role);
 
             return ServiceResult.Success("Success","User created successfully.");
 
@@ -51,7 +51,7 @@ namespace practice_api.Services
 
             if (errors != null)
             {
-                return ServiceResult.Fail("Error", "User create failed.", errors);
+                return ServiceResult.FailWithErrors(errors);
             }
             var user = await _userRepo.FindByIdAsync(id);
 
@@ -59,9 +59,9 @@ namespace practice_api.Services
             user.UserName = request.UserName;
             user.Email = request.Email;
 
-            var updateResult = await _userRepo.UpdateAsync(user);
-            var removeRoleResult = await _userRepo.RemoveFromRoleAsync(user, request.Role);
-            var addRoleResult = await _userRepo.AddToRoleAsync(user, request.Role);
+            await _userRepo.UpdateAsync(user);
+            await _userRepo.RemoveFromRoleAsync(user, request.Role);
+            await _userRepo.AddToRoleAsync(user, request.Role);
      
 
             return ServiceResult.Success("Success", "User Updated successfully.");
