@@ -2,6 +2,7 @@
 
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using practice_api.Contracts;
 using practice_api.Models.Shared;
 using practice_api.Models.Users;
@@ -11,34 +12,35 @@ namespace practice_api.Controllers.v1
 {
     [ApiVersion("1.0")]
     [ApiController]
-
     [Route("api/v{version:apiVersion}/users")]
  
     public class UserController : Controller
     {
         private readonly IUserServices _userService;
-        private readonly IValidationService _validationService;
 
-        public UserController(IUserServices userService, IValidationService validationService) {
+
+        public UserController(IUserServices userService) {
             _userService = userService;
-            _validationService = validationService;
+           
         }
         [Authorize]
         [HttpGet]
-        public async Task<IActionResult> Index([FromQuery]  TableRequest request)
+        public async Task<IActionResult> Index([FromQuery] TableRequest request)
         {
                var table =await _userService.Table(request);
             return Ok(table);
         }
 
 
-        [Authorize]
+   
         [HttpPost]
-        public async Task<IActionResult> Create([FromBody] UserCreateDto request)
+        public async Task<IActionResult> Create( UserCreateDto request)
         {
+
+
             try {
                 var result = await _userService.Create(request);
-    
+          
                 if (result.Errors != null) { 
                     return UnprocessableEntity(result);
                 }
@@ -56,7 +58,7 @@ namespace practice_api.Controllers.v1
   
         }
         [HttpPut("{id}")]
-        public async Task<IActionResult> Update(string id, [FromBody] UserUpdateDto request) { 
+        public async Task<IActionResult> Update(string id, UserUpdateDto request) { 
             try
             {
            

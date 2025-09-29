@@ -18,7 +18,7 @@ namespace practice_api.Validations.User
             RuleFor(x=>x.UserName)
             .Cascade(CascadeMode.Stop)
             .NotEmpty()
-            .WithMessage("Username is Required")
+            .WithMessage("Username is Requiredsd")
             .MustAsync(UniqueUsername).WithMessage("Username already taken");
 
             RuleFor(x => x.Email)
@@ -33,7 +33,20 @@ namespace practice_api.Validations.User
             RuleFor(x => x.Role)
             .Cascade(CascadeMode.Stop)
             .NotEmpty().WithMessage("Role is Required")
-            .MustAsync( RoleExistsAsync).WithMessage("Role does not exist"); 
+            .MustAsync( RoleExistsAsync).WithMessage("Role does not exist");
+
+            RuleFor(x => x.Avatar)
+            .Cascade(CascadeMode.Stop)
+            .Must(file =>
+            {
+            if (file == null) return true; // allow null
+            var ext = Path.GetExtension(file.FileName).ToLower();
+            return new[] { ".jpg", ".jpeg", ".png" }.Contains(ext);
+            })
+            .WithMessage("Only .jpg, .jpeg, and .png files are allowed.")
+
+            .Must(file => file == null || file.Length <= 2 * 1024 * 1024) // 2 MB
+            .WithMessage("Avatar must not exceed 2MB.");
 
         }
 

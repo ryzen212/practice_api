@@ -1,6 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-using System.Text.Json.Serialization;
-
+﻿
 namespace practice_api.Models.Users
 {
     public class UserCreateDto
@@ -18,5 +16,7 @@ namespace practice_api.Models.Users
         public string Password { get; set; }
 
         public string Role { get; set; }
+
+        public IFormFile? Avatar { get; set; }
     }
 }

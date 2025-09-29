@@ -5,6 +5,7 @@ using FluentValidation;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -103,11 +104,18 @@ builder.Services.AddScoped(typeof(ITokenServices), typeof(TokenServices));
 builder.Services.AddScoped(typeof(IValidationService), typeof(ValidationService));
 builder.Services.AddScoped(typeof(IRoleRepository), typeof(RoleRepository));
 
+builder.Services.AddScoped<FileService>();
+
 
 //Validation
 builder.Services.AddValidatorsFromAssembly(typeof(Program).Assembly, includeInternalTypes: true);
 
 //Api  versioning 
+
+builder.Services.Configure<ApiBehaviorOptions>(options =>
+{
+    options.SuppressModelStateInvalidFilter = true;
+});
 
 builder.Services.AddApiVersioning(options =>
 {
@@ -145,7 +153,7 @@ if (app.Environment.IsDevelopment())
 
 //app.MapIdentityApi<IdentityUser>();
 app.UseHttpsRedirection();
-
+app.UseStaticFiles();
 app.UseRateLimiter();
 app.UseCors("FrontEnd");
 app.UseAuthentication();

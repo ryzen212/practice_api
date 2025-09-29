@@ -1,4 +1,5 @@
 ﻿using Azure.Core;
+using Humanizer;
 using Microsoft.EntityFrameworkCore;
 using practice_api.Contracts;
 using practice_api.Data;
@@ -13,16 +14,18 @@ namespace practice_api.Services
    
     public class UserServices : IUserServices
     {
+        private readonly FileService _fileService;
         private readonly IUserRepository _userRepo;
         private readonly AppDbContext _context;
         private readonly IValidationService _validationService;
        
 
-        public UserServices(IUserRepository userRepo,  AppDbContext context, IValidationService validationService)
+        public UserServices(IUserRepository userRepo,  AppDbContext context, IValidationService validationService, FileService fileService)
         {
             _userRepo = userRepo;
             _context = context;
             _validationService = validationService;
+            _fileService = fileService;
         }
        public async Task<ServiceResult> Create(UserCreateDto request)
         {
@@ -31,14 +34,22 @@ namespace practice_api.Services
             if (errors != null) {
                 return ServiceResult.FailWithErrors(errors);
             }
+   
+            var avatar = _fileService.PrepareSaveFile(request.Avatar, "uploads");
+         
             var user = new AppIdentityUser
             {
                 UserName = request.UserName,
                 Email = request.Email,
                 PhoneNumber = request.PhoneNumber,
+                Avatar = avatar.FilePath
             };
+
+            await _fileService.UploadAsync(request.Avatar, avatar.FileName, "uploads");
+
             await _userRepo.CreateAsync(user,request.Password);
             await _userRepo.AddToRoleAsync(user, request.Role);
+
 
             return ServiceResult.Success("Success","User created successfully.");
 
