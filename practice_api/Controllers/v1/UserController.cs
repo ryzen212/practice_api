@@ -58,11 +58,11 @@ namespace practice_api.Controllers.v1
   
         }
         [HttpPut("{id}")]
-        public async Task<IActionResult> Update(string id, UserUpdateDto request) { 
+        public async Task<IActionResult> Update(string id, [FromForm] UserUpdateDto request) { 
             try
             {
            
-                request.Id = id;
+             
                 var result = await _userService.Update(id,request);
 
                 if (result.Errors != null)

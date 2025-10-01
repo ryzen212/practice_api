@@ -6,8 +6,6 @@ namespace practice_api.Models.Users
     {
         public string Id {  get; set; }
         public string UserName { get; set; }
-
-
         public string Email { get; set; }
 
 
@@ -15,5 +13,7 @@ namespace practice_api.Models.Users
 
 
         public string Role { get; set; }
+
+        public IFormFile? Avatar { get; set; }
     }
 }

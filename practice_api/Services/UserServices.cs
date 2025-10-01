@@ -36,7 +36,7 @@ namespace practice_api.Services
             }
    
             var avatar = _fileService.PrepareSaveFile(request.Avatar, "uploads");
-         
+          
             var user = new AppIdentityUser
             {
                 UserName = request.UserName,
@@ -57,23 +57,33 @@ namespace practice_api.Services
 
         public async Task<ServiceResult> Update(string id, UserUpdateDto request)
         {
-            Console.WriteLine(request.Id);
+           Console.WriteLine(request.Id);
             var errors = await _validationService.ValidateAsync(request);
 
             if (errors != null)
             {
                 return ServiceResult.FailWithErrors(errors);
             }
+
+            var avatar = _fileService.PrepareSaveFile(request.Avatar, "uploads");
+
             var user = await _userRepo.FindByIdAsync(id);
+            var oldImg = user.Avatar;
 
             user.PhoneNumber = request.PhoneNumber;
             user.UserName = request.UserName;
             user.Email = request.Email;
+            user.Avatar = avatar.FilePath;
+
+
+        
 
             await _userRepo.UpdateAsync(user);
             await _userRepo.RemoveFromRoleAsync(user, request.Role);
             await _userRepo.AddToRoleAsync(user, request.Role);
-     
+
+            await _fileService.UploadAsync(request.Avatar, avatar.FileName, "uploads");
+            _fileService.DeleteFile(oldImg);
 
             return ServiceResult.Success("Success", "User Updated successfully.");
 
