@@ -13,7 +13,7 @@ namespace practice_api.Models.Users
 
 
         public string Role { get; set; }
-
+        public bool AvatarChanged { get; set; }
         public IFormFile? Avatar { get; set; }
     }
 }

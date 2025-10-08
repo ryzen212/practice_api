@@ -64,7 +64,6 @@ namespace practice_api.Services
             {
                 return ServiceResult.FailWithErrors(errors);
             }
-
             var avatar = _fileService.PrepareSaveFile(request.Avatar, "uploads");
 
             var user = await _userRepo.FindByIdAsync(id);
@@ -73,17 +72,24 @@ namespace practice_api.Services
             user.PhoneNumber = request.PhoneNumber;
             user.UserName = request.UserName;
             user.Email = request.Email;
-            user.Avatar = avatar.FilePath;
 
+            if (request.AvatarChanged)
+            {
+                user.Avatar = avatar.FilePath;
+            }
 
-        
 
             await _userRepo.UpdateAsync(user);
             await _userRepo.RemoveFromRoleAsync(user, request.Role);
             await _userRepo.AddToRoleAsync(user, request.Role);
 
-            await _fileService.UploadAsync(request.Avatar, avatar.FileName, "uploads");
-            _fileService.DeleteFile(oldImg);
+            if (request.AvatarChanged)
+            {
+                await _fileService.UploadAsync(request.Avatar, avatar.FileName, "uploads");
+                _fileService.DeleteFile(oldImg);
+            }
+        
+         
 
             return ServiceResult.Success("Success", "User Updated successfully.");
 
@@ -99,9 +105,9 @@ namespace practice_api.Services
                                select new UserDto
                                {
                                  Id = users.Id,
-                                 UserName = users.Email,
+                                UserName = users.Email,
                                  Role = roleJoin.Name,
-                                 Avatar = users.Avatar,
+                                Avatar = _fileService.GetFileUrl(users.Avatar),
                                  Email = users.Email,
                                  PhoneNumber = users.PhoneNumber,
 

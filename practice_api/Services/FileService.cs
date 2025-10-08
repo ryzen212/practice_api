@@ -5,9 +5,11 @@ namespace practice_api.Services
     public class FileService
     {
         private readonly IWebHostEnvironment _webHost;
-        public FileService(IWebHostEnvironment webHost)
+        private readonly IHttpContextAccessor _httpContextAccessor;
+        public FileService(IWebHostEnvironment webHost, IHttpContextAccessor httpContextAccessor)
         {
             _webHost = webHost;
+            _httpContextAccessor = httpContextAccessor;
         }
 
 
@@ -83,22 +85,21 @@ namespace practice_api.Services
             return result;
         }
 
-        public string ResolveUserImageUrl(string userImg)
+        public string GetFileUrl(string userImg)
         {
-
-            if (string.IsNullOrWhiteSpace(userImg))
-                return "/images/no_image.png";
-
+            if (!string.IsNullOrWhiteSpace(userImg))
+            {
 
             var fullPath = Path.Combine(_webHost.WebRootPath, userImg.TrimStart('/'));
 
             if (File.Exists(fullPath))
             {
-                return userImg;
-
+                // Build a public URL (not a system path)
+            var baseUrl = $"{_httpContextAccessor.HttpContext.Request.Scheme}://{_httpContextAccessor.HttpContext.Request.Host}";
+            return $"{baseUrl}/{userImg.TrimStart('/')}";
+                }
             }
-
-            return "/images/no_image.png";
+            return null;
         }
     }
 }
